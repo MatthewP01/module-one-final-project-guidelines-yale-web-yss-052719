@@ -18,8 +18,10 @@ class Galaxy < ActiveRecord::Base
     end
   end
 
-
-
-
+  def count_planets(type_id)
+    self.planets.select do |planet|
+      planet.planet_type_id == type_id
+    end.count
+  end
 
 end

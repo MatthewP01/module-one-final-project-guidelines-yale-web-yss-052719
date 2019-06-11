@@ -20,8 +20,8 @@ end
 def choice
   clear_screen
   user_choice = PROMPT.select("What would you like to do?") do |option|
-    option.choice "Fight"
-    option.choice "Manage your Galaxy"
+    option.choice "Fight", 1
+    option.choice "Manage your Galaxy", 2
     user_choice
   end
 end
@@ -60,7 +60,10 @@ def ask_for_galaxy(id_use)
   clear_screen
   User.find(id_use).galaxies << new_galaxy
   ask_for_planets(new_galaxy)
-  choice
+  # user_choice = choice
+  if choice == 2
+    view_planets(new_galaxy)
+  end
 end
 
 def planet_function(new_galaxy, counter, type, type_id)
@@ -97,4 +100,10 @@ def ask_for_planets(new_galaxy)
   else
     return 0
   end
+end
+
+def view_planets(galaxy)
+  puts "Resource Planets: #{galaxy.count_planets(1)}"
+  puts  "Strength Planets: #{galaxy.count_planets(2)}"
+  puts "Technology Planets: #{galaxy.count_planets(3)}"
 end
