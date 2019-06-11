@@ -5,7 +5,6 @@ def clear_screen
 end
 
 def start_game
-
   # Catpix::print_image "./media/planet_pic.jpg",
   #   :limit_x => 0.5,
   #   :limit_y => 0.5,
@@ -16,6 +15,15 @@ def start_game
   # puts "\n\n\n"
 
   begin_this_game
+end
+
+def choice
+  clear_screen
+  user_choice = PROMPT.select("What would you like to do?") do |option|
+    option.choice "Fight"
+    option.choice "Manage your Galaxy"
+    user_choice
+  end
 end
 
 def begin_this_game
@@ -30,9 +38,11 @@ def begin_this_game
     active_user =  User.all.find_by(name: name_input)
     clear_screen
     puts "Welcome back Almighty #{active_user.name}"
+    choice
   else
     new_user = User.create(name: name_input)
     user_id = new_user.id
+    clear_screen
     puts "Welcome, Almighy #{new_user.name}"
     ask_for_galaxy(user_id)
   end
@@ -48,16 +58,16 @@ def ask_for_galaxy(id_use)
 
   new_galaxy = Galaxy.create(name: galaxy_input, user_id: id_use)
   clear_screen
-  puts "Enjoy your new galaxy, #{new_galaxy.name}"
   User.find(id_use).galaxies << new_galaxy
   ask_for_planets(new_galaxy)
+  choice
 end
 
 def planet_function(new_galaxy, counter, type, type_id)
   # prompt = TTY::Prompt.new
   # PlanetType.create(name: type)
   # clear_screen
-  puts "You have #{counter} planets to make - you can use them to build your:\nstrength\ntechology\nresources"
+  puts "Enjoy your new galaxy! You have #{counter} planets to make - you can use them to build your:\nstrength\ntechology\nresources"
   planet_input = PROMPT.ask("How many #{type} planets would you like to create?") do |q|
     q.required true
   end.to_i
@@ -71,16 +81,20 @@ def planet_function(new_galaxy, counter, type, type_id)
 end
 
 def ask_for_planets(new_galaxy)
+  clear_screen
   counter = 10
   counter -= planet_function(new_galaxy, counter, "Resources", 1)
+  clear_screen
   if counter > 0
     counter -= planet_function(new_galaxy, counter, "Strength", 2)
+    clear_screen
   else
-    exit 0
+    return 0
   end
   if counter > 0
     counter -= planet_function(new_galaxy, counter, "Technology", 3)
+    clear_screen
   else
-    exit 0
+    return 0
   end
 end
