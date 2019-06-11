@@ -7,3 +7,6 @@ gem "pry"
 gem "require_all"
 gem "tty-prompt"
 gem "catpix"
+gem 'image_optim'
+gem 'lolcat'
+gem 'lolize'

@@ -14,7 +14,7 @@ class Galaxy < ActiveRecord::Base
 
   def create_planets(num, type_id)
     num.times do
-      Planet.create(planet_type_id: type_id, user_id: self)
+      Planet.create(planet_type_id: type_id, galaxy_id: self.id)
     end
   end
 
