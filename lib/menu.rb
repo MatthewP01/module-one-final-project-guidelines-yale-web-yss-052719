@@ -27,14 +27,7 @@ def start_game
   begin_this_game
 end
 
-def choice
-  clear_screen
-  user_choice = PROMPT.select("What would you like to do?") do |option|
-    option.choice "Fight!"
-    option.choice"Manage your Galaxy"
-    option.choice "Quit"
-  end
-end
+
 
 def begin_this_game
   # prompt = TTY::Prompt.new
@@ -52,7 +45,7 @@ def begin_this_game
     user = User.create(name: name_input)
     user_id = user.id
     # clear_screen
-    puts "Welcome, Almighy #{user.name}"
+    puts "Welcome, Almighty #{user.name}"
     ask_for_galaxy(user_id)
   end
   galaxy = user.galaxies.first
@@ -60,24 +53,28 @@ def begin_this_game
 end
 
 def run_game(user, galaxy)
+
   continue = true
   resource_planets = galaxy.count_planets(PlanetType.find_by(name: "Resources").id)
   puts resource_planets
   if resource_planets == 0
-    puts "Gave Over"
+    puts "Game Over"
     continue = false
   end
   while continue
-    if choice == "Manage your Galaxy"
+    clear_screen
+    options = ['Fight!', 'Manage your Galaxy', 'Quit']
+    user_choice = PROMPT.select("What would you like to do?", options)
+    if user_choice == "Manage your Galaxy"
       manage_planets(galaxy)
-    elsif choice == "Fight!"
+    elsif user_choice == "Fight!"
       fight(user)
-    elsif choice == "Quit"
-      puts "Goodbye"
+    elsif user_choice == "Quit"
+      puts "Goodbye...\n"
       continue = false
     end
     if resource_planets == 0
-      puts "Gave Over"
+      puts "Game Over"
       continue = false
     end
   end
