@@ -10,11 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190610173952) do
+ActiveRecord::Schema.define(version: 2019_06_11_195342) do
 
   create_table "galaxies", force: :cascade do |t|
-    t.string  "name"
+    t.string "name"
     t.integer "user_id"
+    t.integer "unallocated"
   end
 
   create_table "planet_types", force: :cascade do |t|
@@ -22,7 +23,7 @@ ActiveRecord::Schema.define(version: 20190610173952) do
   end
 
   create_table "planets", force: :cascade do |t|
-    t.string  "name"
+    t.string "name"
     t.integer "planet_type_id"
     t.integer "galaxy_id"
   end

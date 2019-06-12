@@ -10,3 +10,4 @@ gem "catpix"
 gem 'image_optim'
 gem 'lolcat'
 gem 'lolize'
+gem 'colorize'

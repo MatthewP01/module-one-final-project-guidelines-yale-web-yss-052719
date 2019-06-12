@@ -19,6 +19,7 @@ GEM
       ruby-terminfo (~> 0.1, >= 0.1.1)
       tco (~> 0.1, >= 0.1.8)
     coderay (1.1.2)
+    colorize (0.8.1)
     concurrent-ruby (1.1.5)
     docopt (0.6.1)
     equatable (0.5.0)
@@ -90,6 +91,7 @@ PLATFORMS
 
 DEPENDENCIES
   catpix
+  colorize
   image_optim
   lolcat
   lolize
