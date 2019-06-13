@@ -5,6 +5,41 @@ def clear_screen
   system "clear"
 end
 
+def win_sound
+  # Credit for inspiration from Pokemon Go Lite project
+  pid = fork{ exec 'afplay', './media/cheer.mp3' }
+  sleep(0.5)
+end
+
+def lose_sound
+  pid = fork{ exec 'afplay', './media/nooo.mp3' }
+  sleep(0.5)
+end
+
+def story_start
+  clear_screen
+  puts "\nYou wake up one morning and recognize yourself in a dark empty space.\n\n"
+  sleep(2)
+  puts "You realize you’re in the abyss, yet you feel strangely free and disconnected from your physical form. “Could this be…the beyond?”\n\n"
+  sleep(2)
+  puts "Suddenly, the same voice answers and allows you to realize you’re beyond space and time itself, and you are indeed, A GOD.\n\n"
+  sleep(2)
+  puts "Your purpose following is clear, to create galaxies and planets with thriving populations of unique beings to span your vast dimension.\n\n"
+  sleep(2)
+  puts "Yet you fear that soon enemies will arise and understand you’ll need to use and sacrifice your very creations to defend your own honor and glory.\n\n"
+  sleep(2)
+  puts "Thus begins the saga of…  "
+  start_game
+end
+
+def instructions
+  puts "Instructions\n".bold.underline
+  puts "1. You start your galaxy with 10 planets, but you must make at least one resource planet (this is your health)\n\n"
+  puts "2. Other users will be paired with you randomly, and your success or failure in each round depends on how many planets you have of the randomly selected trait in each round\n\n"
+  puts "3. Winning a round will give you 1 new planet to allocate and contribute to either strength or technology, and allow you to sustain resources to keep your galaxy thriving. Losing will allow you to gain one unallocated planet, but cause you to lose a resource planet as well.\n\n"
+  puts "4. The game ends when you run out of resource planets, so it’s advisable to start with a balance between resources and the other two categories.\n\n"
+end
+
 def start_game
    str = "  _____     __                 _      __
  / ___/__ _/ /__ ___ ____ __  | | /| / /__ ________
@@ -22,7 +57,8 @@ def start_game
     :center_y => false,
     :resolution => "auto"
 
-  puts "\n\n\n"
+  puts "\n\n"
+
   begin_this_game
 end
 
@@ -47,12 +83,15 @@ def begin_this_game
         user = User.create(name: name_input)
         user_id = user.id
         puts "\n 👑  Welcome, Almighty #{user.name} 👑\n".yellow.bold
+        sleep(1)
+        instructions
+        PROMPT.keypress("Press Enter to make your galaxy!\n\n", key: [:return])
         ask_for_galaxy(user_id)
         ask = false
       end
     end
     run_game(user)
-    
+
   elsif login_choice == "Login as existing GOD"
     name_input = PROMPT.ask("Hello GOD - What are you called?") do |q|
       q.required true
@@ -70,6 +109,8 @@ def begin_this_game
 
   elsif login_choice == "Quit".red
     puts "\nCome back soon!!\n\n"
+    sleep(2)
+    clear_screen
   end
 end
 
@@ -89,15 +130,21 @@ def run_game(user)
   while continue
     galaxy = user.galaxies.first
     clear_screen
-    options = ['Fight!','Manage your Galaxy', 'Create New God or Log In as Another God', 'Delete your God', 'Quit']
+    options = ['View Instructions', 'Fight!'.bold,'Manage your Galaxy', 'Create New God or Log In as Another God', 'Delete your God', 'Quit']
     user_choice = PROMPT.select("What would you like to do?", options)
     if user_choice == "Manage your Galaxy"
       manage_planets(galaxy)
-    elsif user_choice == "Fight!"
+    elsif user_choice == "Fight!".bold
       fight(user)
     elsif user_choice == "Quit"
-      puts "Goodbye...\n"
+      puts "\nGoodbye...\n\n"
+      sleep(3)
+      clear_screen
       continue = false
+      exit 0
+    elsif user_choice == "View Instructions"
+      instructions
+      PROMPT.keypress("\nPress Enter to return to menu", key: [:return])
     elsif user_choice == "Create New God or Log In as Another God"
       start_game
       continue = false
@@ -105,7 +152,7 @@ def run_game(user)
       if PROMPT.yes?("Are you sure? Y/N")
         destroy_user(user)
         continue = false
-        puts "Create a new God to play again!"
+        puts "God delected! Create a new God to play again!"
         sleep(3)
         clear_screen
         start_game
@@ -172,7 +219,7 @@ def manage_planets(galaxy)
 
   if this_user_unallocated == 0
     continue = false
-    puts "No new planets - fight again to get more!"
+    puts "No new planets - fight again to get more!".bold
   else
     continue = true
   end
@@ -199,7 +246,7 @@ def manage_planets(galaxy)
         menu.choice "No"
       end
     elsif this_user_unallocated == 0
-      puts  "\nOut of new planets - fight again to get more!"
+      puts  "\nOut of new planets - fight again to get more!".bold
       puts "\nCurrent Status:"
       view_planets(galaxy)
       continue = false
@@ -250,12 +297,14 @@ def fight(this_user)
   sleep(1)
   if user_attr > enemy_attr
     puts "\nYOU WIN!!! 😎\n".blink
+    win_sound
     win_or_lose(this_user, enemy_user, "win")
   elsif user_attr == enemy_attr
     puts "\nIt's a Draw 🙏\n".underline
     win_or_lose(this_user, enemy_user, "draw")
   else
     puts "\nYou Lose 😈 💀\n".bold
+    lose_sound
     win_or_lose(this_user, enemy_user, "lose")
   end
   PROMPT.keypress("Press ENTER to return to menu", keys: [:return])
