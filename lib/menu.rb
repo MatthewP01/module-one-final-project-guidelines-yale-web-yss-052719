@@ -23,18 +23,10 @@ def start_game
     :resolution => "auto"
 
   puts "\n\n\n"
-
   begin_this_game
 end
 
 def begin_this_game
-  # prompt = TTY::Prompt.new
-
-  # name_input = PROMPT.ask("Hello GOD - What shall you name thyself?") do |q|
-  #   q.required true
-  #   q.convert :string
-  # end
-
   login_choice = PROMPT.select("Create a new GOD or Login as an existing GOD\n".bold) do |option|
     option.choice "Create new GOD"
     option.choice "Login as existing GOD"
@@ -42,15 +34,25 @@ def begin_this_game
   end
 
   if login_choice == "Create new GOD"
-    name_input = PROMPT.ask("Hello GOD - What shall you name thyself?") do |q|
-      q.required true
-      q.convert :string
+    ask = true
+
+    while ask
+      name_input = PROMPT.ask("Hello GOD - What shall you name thyself?") do |q|
+        q.required true
+        q.convert :string
+      end
+      if User.all.find_by(name: name_input)
+        puts "\nSorry, that Godname is taken. Please choose another.\n".red.bold
+      else
+        user = User.create(name: name_input)
+        user_id = user.id
+        puts "\n 👑  Welcome, Almighty #{user.name} 👑\n".yellow.bold
+        ask_for_galaxy(user_id)
+        ask = false
+      end
     end
-    user = User.create(name: name_input)
-    user_id = user.id
-    # clear_screen
-    puts "\n 👑  Welcome, Almighty #{user.name} 👑\n".yellow.bold
-    ask_for_galaxy(user_id)
+    run_game(user)
+    
   elsif login_choice == "Login as existing GOD"
     name_input = PROMPT.ask("Hello GOD - What are you called?") do |q|
       q.required true
@@ -64,15 +66,14 @@ def begin_this_game
      puts "\nThis GOD does not exist!\n".bold
      begin_this_game
     end
-  elsif login_choice == "Quit"
-    puts "Come back soon!!"
-    exit 0
+    run_game(user)
+
+  elsif login_choice == "Quit".red
+    puts "\nCome back soon!!\n\n"
   end
-  run_game(user)
 end
 
 def run_game(user)
-
   continue = true
   galaxy = user.galaxies.first
   resource_planets = galaxy.count_planets(PlanetType.find_by(name: "Resources").id)
@@ -124,19 +125,9 @@ def ask_for_galaxy(id_use)
   this_user = User.find(id_use)
   this_user.galaxies << new_galaxy
   ask_for_planets(new_galaxy)
-  # user_choice = choice
-  # if choice == 2
-  #   manage_planets(new_galaxy)
-  # elsif choice == 1
-  #   fight(this_user)
-  # end
-
 end
 
 def planet_function(new_galaxy, counter, type)
-  # prompt = TTY::Prompt.new
-  # PlanetType.create(name: type)
-  # clear_screen
   type_id = PlanetType.find_by(name: type).id
   puts "\nEnjoy your new galaxy - #{new_galaxy.name}! You have #{counter} planets to create."
   puts "\nThere are three types of planets:\nResources\nStrength\nTechology\n\n"
@@ -163,14 +154,12 @@ def ask_for_planets(new_galaxy)
   end
   if counter > 0
     counter -= planet_function(new_galaxy, counter, "Technology")
-    # clear_screen
   else
     return 0
   end
 end
 
 def view_planets(galaxy)
-  # clear_screen
   puts "Resource Planets: #{galaxy.count_planets(PlanetType.find_by(name: "Resources").id)}"
   puts  "Strength Planets: #{galaxy.count_planets(PlanetType.find_by(name: "Strength").id)}"
   puts "Technology Planets: #{galaxy.count_planets(PlanetType.find_by(name: "Technology").id)}"
@@ -184,7 +173,6 @@ def manage_planets(galaxy)
   if this_user_unallocated == 0
     continue = false
     puts "No new planets - fight again to get more!"
-    #PROMPT.keypress("Press ENTER to return to menu", keys: [:return])
   else
     continue = true
   end
@@ -226,8 +214,6 @@ def manage_planets(galaxy)
 end
 
 def find_enemy(this_user)
-  # Check if any other users with resources != 0
-  # Check that self != 0
   checking = User.all.all? do |user|
     user.galaxies.first.count_planets(PlanetType.find_by(name: "Resources").id) == 0 || user == this_user
   end
@@ -238,7 +224,6 @@ def find_enemy(this_user)
     start_game
 
   else
-    #enemy_user = nil
     enemy_user = User.all[(rand(User.all.size))]
     until enemy_user != this_user && enemy_user.galaxies.first.count_planets(PlanetType.find_by(name: "Resources").id) != 0
       enemy_user = User.all[(rand(User.all.size))]
@@ -266,15 +251,12 @@ def fight(this_user)
   if user_attr > enemy_attr
     puts "\nYOU WIN!!! 😎\n".blink
     win_or_lose(this_user, enemy_user, "win")
-    #sleep(4)
   elsif user_attr == enemy_attr
     puts "\nIt's a Draw 🙏\n".underline
     win_or_lose(this_user, enemy_user, "draw")
-    #sleep(4)
   else
     puts "\nYou Lose 😈 💀\n".bold
     win_or_lose(this_user, enemy_user, "lose")
-    #sleep(4)
   end
   PROMPT.keypress("Press ENTER to return to menu", keys: [:return])
 end
@@ -296,7 +278,6 @@ def win_or_lose(user, enemy_user, outcome)
       puts "Game Over - You ran out of resources!".red.bold
       puts "Goodbye - thanks for playing"
       destroy_user(user)
-      # continue = false
       PROMPT.keypress("Press ENTER to start again", keys: [:return])
       clear_screen
       start_game
