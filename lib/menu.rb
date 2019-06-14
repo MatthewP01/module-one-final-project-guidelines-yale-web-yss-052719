@@ -130,13 +130,13 @@ def run_game(user)
   while continue
     galaxy = user.galaxies.first
     clear_screen
-    options = ['View Instructions', 'Fight!'.bold,'Manage your Galaxy', 'Create New God or Log In as Another God', 'Delete your God', 'Quit']
+    options = ['View Instructions', 'Fight!'.bold,'Manage your Galaxy', 'Create New God or Log In as Another God', 'Delete your God', 'Quit'.red]
     user_choice = PROMPT.select("What would you like to do?", options)
     if user_choice == "Manage your Galaxy"
       manage_planets(galaxy)
     elsif user_choice == "Fight!".bold
       fight(user)
-    elsif user_choice == "Quit"
+    elsif user_choice == "Quit".red
       puts "\nGoodbye...\n\n"
       sleep(3)
       clear_screen
@@ -152,7 +152,7 @@ def run_game(user)
       if PROMPT.yes?("Are you sure? Y/N")
         destroy_user(user)
         continue = false
-        puts "God delected! Create a new God to play again!"
+        puts "God deleted! Create a new God to play again!"
         sleep(3)
         clear_screen
         start_game
@@ -323,9 +323,8 @@ def win_or_lose(user, enemy_user, outcome)
     this_var.destroy
     enemy_user.galaxies.first.create_planets(1, resource_id)
     if user.galaxies.first.count_planets(PlanetType.find_by(name: "Resources").id) == 0
-      puts "Game Over".red.bold
-      puts "Game Over - You ran out of resources!".red.bold
-      puts "Goodbye - thanks for playing"
+      puts "Game Over - You ran out of resources!\n".red.bold
+      puts "Goodbye - thanks for playing\n"
       destroy_user(user)
       PROMPT.keypress("Press ENTER to start again", keys: [:return])
       clear_screen
